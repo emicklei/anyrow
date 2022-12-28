@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+// protofmt -w  fieldset.proto
+
+package anyrow;
+
+option go_package = "/pb";
+
+message RowSet {
+           string       table_name     = 1;
+  repeated ColumnSchema column_schemas = 2;
+  repeated Row          rows           = 3;
+}
+
+message ColumnSchema {
+  string name          = 1;
+  string type_name     = 2;
+  bool   is_nullable   = 3;
+  bool   is_primarykey = 4;
+}
+
+message Row {
+  repeated ColumnValue columns = 1;
+}
+
+message ColumnValue {
+  // https://www.w3schools.com/js/js_json_datatypes.asp
+  oneof json_value {
+    string string_value         = 1;
+    float  number_float_value   = 2;
+    int64  number_integer_value = 3;
+    string object_value         = 4;
+    string array_value          = 5;
+    bool   bool_value           = 6;
+  }
+}
+
+message T {
+  map <string,string> custom_values = 1;
+}
+
