@@ -97,10 +97,12 @@ func fetchObjects(ctx context.Context, conn Querier, metaSet *pb.RowSet, pkv Pri
 	}
 	qb.WriteString(" FROM ")
 	qb.WriteString(metaSet.TableName)
-	qb.WriteString(" WHERE ")
-	qb.WriteString(pkv.Column)
-	fmt.Fprintf(qb, " IN (%s)", composeQueryParams(len(pkv.Values)))
-
+	// if no values in pkv then fetch all
+	if len(pkv.Values) > 0 {
+		qb.WriteString(" WHERE ")
+		qb.WriteString(pkv.Column)
+		fmt.Fprintf(qb, " IN (%s)", composeQueryParams(len(pkv.Values)))
+	}
 	dbrows, err := conn.Query(ctx, qb.String(), pkv.Values...)
 	if err != nil {
 		return nil, err
@@ -162,9 +164,12 @@ func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, pkv Prim
 	}
 	qb.WriteString(" FROM ")
 	qb.WriteString(metaSet.TableName)
-	qb.WriteString(" WHERE ")
-	qb.WriteString(pkv.Column)
-	fmt.Fprintf(qb, " IN (%s)", composeQueryParams(len(pkv.Values)))
+	// if no values in pkv then fetch all
+	if len(pkv.Values) > 0 {
+		qb.WriteString(" WHERE ")
+		qb.WriteString(pkv.Column)
+		fmt.Fprintf(qb, " IN (%s)", composeQueryParams(len(pkv.Values)))
+	}
 
 	dbrows, err := conn.Query(ctx, qb.String(), pkv.Values...)
 	if err != nil {
