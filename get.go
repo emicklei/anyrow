@@ -8,7 +8,6 @@ import (
 	"math"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/emicklei/anyrow/pb"
 	"github.com/emicklei/tre"
@@ -16,12 +15,6 @@ import (
 	pgx "github.com/jackc/pgx/v4"
 	"github.com/patrickmn/go-cache"
 )
-
-var metaCache *cache.Cache
-
-func init() {
-	metaCache = cache.New(5*time.Minute, 10*time.Minute)
-}
 
 // Object represents a Table row as a Map.
 type Object map[string]any
@@ -63,40 +56,6 @@ func FetchRowSet(ctx context.Context, conn Querier, tableName string, pkv Primar
 		set = mset
 	}
 	return fetchValues(ctx, conn, set.(*pb.RowSet), pkv)
-}
-
-func getMetadata(ctx context.Context, conn Querier, tableName string) (*pb.RowSet, error) {
-	query := `
-SELECT column_name, data_type, is_nullable
-FROM information_schema.columns
-WHERE table_name = $1;
-`
-	rows, err := conn.Query(ctx, query, tableName)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	set := new(pb.RowSet)
-	set.TableName = tableName
-	for rows.Next() {
-		var columnName, dataType, isNullable string
-		if err := rows.Scan(&columnName, &dataType, &isNullable); err != nil {
-			var pgErr *pgconn.PgError
-			if errors.As(err, &pgErr) {
-				fmt.Println(pgErr.Message) // => syntax error at end of input
-				fmt.Println(pgErr.Code)    // => 42601
-			}
-			return nil, err
-		}
-		set.ColumnSchemas = append(set.ColumnSchemas, &pb.ColumnSchema{
-			Name:         columnName,
-			TypeName:     dataType,
-			IsNullable:   isNullable == "YES",
-			IsPrimarykey: false,
-		})
-	}
-	return set, nil
 }
 
 func filterObjects(ctx context.Context, conn Querier, metaSet *pb.RowSet, where string) (list []Object, err error) {
@@ -161,6 +120,11 @@ func filterObjects(ctx context.Context, conn Querier, metaSet *pb.RowSet, where 
 		list = append(list, obj)
 	}
 	return list, nil
+}
+
+type fetchFilter struct {
+	pkv   PrimaryKeyAndValues
+	where string
 }
 
 func fetchObjects(ctx context.Context, conn Querier, metaSet *pb.RowSet, pkv PrimaryKeyAndValues) (list []Object, err error) {
@@ -229,6 +193,24 @@ func fetchObjects(ctx context.Context, conn Querier, metaSet *pb.RowSet, pkv Pri
 	}
 	return list, nil
 }
+
+type valueStorer interface {
+	storeDefault(name string, value any)
+	storeBool(name string, value bool)
+	storeString(name string, value string)
+	storeFloat32(name string, value float32)
+	storeInt64(name string, value int64)
+}
+
+type objectStorer struct {
+	target Object
+}
+
+func (o objectStorer) storeDefault(name string, value any)     {}
+func (o objectStorer) storeBool(name string, value bool)       {}
+func (o objectStorer) storeString(name string, value string)   {}
+func (o objectStorer) storeFloat32(name string, value float32) {}
+func (o objectStorer) storeInt64(name string, value int64)     {}
 
 func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, pkv PrimaryKeyAndValues) (*pb.RowSet, error) {
 	// get values

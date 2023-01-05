@@ -3,6 +3,7 @@ module github.com/emicklei/anyrow
 go 1.19
 
 require (
+	github.com/emicklei/tre v1.4.0
 	github.com/jackc/pgconn v1.13.0
 	github.com/jackc/pgx/v4 v4.17.2
 	github.com/patrickmn/go-cache v2.1.0+incompatible
