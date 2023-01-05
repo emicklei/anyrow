@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/emicklei/anyrow/pb"
+	"github.com/emicklei/tre"
 	"github.com/jackc/pgconn"
 	pgx "github.com/jackc/pgx/v4"
 	"github.com/patrickmn/go-cache"
@@ -24,6 +25,19 @@ func init() {
 
 // Object represents a Table row as a Map.
 type Object map[string]any
+
+func FilterObjects(ctx context.Context, conn Querier, tableName string, where string) ([]Object, error) {
+	set, ok := metaCache.Get(tableName)
+	if !ok {
+		mset, err := getMetadata(ctx, conn, tableName)
+		if err != nil {
+			return nil, err
+		}
+		metaCache.Set(tableName, mset, cache.DefaultExpiration)
+		set = mset
+	}
+	return filterObjects(ctx, conn, set.(*pb.RowSet), where)
+}
 
 func FetchObjects(ctx context.Context, conn Querier, tableName string, pkv PrimaryKeyAndValues) ([]Object, error) {
 	set, ok := metaCache.Get(tableName)
@@ -85,6 +99,70 @@ WHERE table_name = $1;
 	return set, nil
 }
 
+func filterObjects(ctx context.Context, conn Querier, metaSet *pb.RowSet, where string) (list []Object, err error) {
+	// get values
+	qb := new(strings.Builder)
+	qb.WriteString("SELECT ")
+	for i, each := range metaSet.ColumnSchemas {
+		if i > 0 {
+			qb.WriteRune(',')
+		}
+		fmt.Fprintf(qb, "to_json(\"%s\")", each.Name) // always escape
+	}
+	qb.WriteString(" FROM ")
+	qb.WriteString(metaSet.TableName)
+	qb.WriteString(" WHERE ")
+	qb.WriteString(where)
+
+	dbrows, err := conn.Query(ctx, qb.String())
+	if err != nil {
+		return nil, tre.New(err, "conn.Query", "sql", qb.String())
+	}
+	defer dbrows.Close()
+
+	for dbrows.Next() {
+		all, err := dbrows.Values()
+		if err != nil {
+			var pgErr *pgconn.PgError
+			if errors.As(err, &pgErr) {
+				fmt.Println(pgErr.Message) // => syntax error at end of input
+				fmt.Println(pgErr.Code)    // => 42601
+			}
+			return nil, err
+		}
+		obj := map[string]any{}
+		for i, each := range all {
+			if each == nil {
+				continue
+			}
+			schema := metaSet.ColumnSchemas[i]
+			switch each.(type) {
+			case string:
+				obj[schema.Name] = each.(string)
+			case float64:
+				// check for integer like
+				tn := metaSet.ColumnSchemas[i].TypeName
+				if strings.Contains("integer bigint smallint", tn) {
+					f := each.(float64)
+					fint, _ := math.Modf(f)
+					obj[schema.Name] = int64(fint)
+				} else {
+					// is a float like
+					obj[schema.Name] = float32(each.(float64))
+				}
+			case map[string]any, []any:
+				obj[schema.Name] = each
+			case bool:
+				obj[schema.Name] = each.(bool)
+			default:
+				obj[schema.Name] = each
+			}
+		}
+		list = append(list, obj)
+	}
+	return list, nil
+}
+
 func fetchObjects(ctx context.Context, conn Querier, metaSet *pb.RowSet, pkv PrimaryKeyAndValues) (list []Object, err error) {
 	// get values
 	qb := new(strings.Builder)
@@ -93,7 +171,7 @@ func fetchObjects(ctx context.Context, conn Querier, metaSet *pb.RowSet, pkv Pri
 		if i > 0 {
 			qb.WriteRune(',')
 		}
-		fmt.Fprintf(qb, "to_json(%s)", each.Name)
+		fmt.Fprintf(qb, "to_json(\"%s\")", each.Name) // always escape
 	}
 	qb.WriteString(" FROM ")
 	qb.WriteString(metaSet.TableName)
