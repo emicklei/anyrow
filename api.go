@@ -18,7 +18,7 @@ func FilterLimit(limit int) filterOption {
 // Object represents a Table row as a Map.
 type Object map[string]any
 
-// FilterObjects queries a table using a WHERE clause. DefaultLimit is used.
+// FilterObjects queries a table using a WHERE clause. Unless option is given, the limit is 1000.
 func FilterObjects(ctx context.Context, conn Querier, tableName string, where string, options ...filterOption) ([]Object, error) {
 	set, ok := metaCache.Get(tableName)
 	if !ok {
@@ -43,6 +43,7 @@ func FilterObjects(ctx context.Context, conn Querier, tableName string, where st
 	return collector.list, err
 }
 
+// FetchObjects returns a list of Objects (generic maps) for the given list primary key values.
 func FetchObjects(ctx context.Context, conn Querier, tableName string, pkv PrimaryKeyAndValues) ([]Object, error) {
 	set, ok := metaCache.Get(tableName)
 	if !ok {
@@ -63,6 +64,7 @@ func FetchObjects(ctx context.Context, conn Querier, tableName string, pkv Prima
 	return collector.list, err
 }
 
+// FetchObjects returns a protobuf RowSet for the given list primary key values.
 func FetchRowSet(ctx context.Context, conn Querier, tableName string, pkv PrimaryKeyAndValues) (*pb.RowSet, error) {
 	set, ok := metaCache.Get(tableName)
 	if !ok {
@@ -83,15 +85,18 @@ func FetchRowSet(ctx context.Context, conn Querier, tableName string, pkv Primar
 	return collector.set, err
 }
 
+// Querier is the method used for a connection.
 type Querier interface {
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
 }
 
+// PrimaryKeyAndValues is a parameter object holding the column name and one or more values.
 type PrimaryKeyAndValues struct {
 	Column string
 	Values []any
 }
 
+// MakePrimaryKeyAndValues creates a parameter object.
 func MakePrimaryKeyAndValues(column string, value ...any) PrimaryKeyAndValues {
 	return PrimaryKeyAndValues{Column: column, Values: value}
 }
