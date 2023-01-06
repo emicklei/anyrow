@@ -98,6 +98,10 @@ func TestFetchRowSet(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	cachedSet, _ := metaCache.Get("test")
+	if got, want := len((cachedSet.(*pb.RowSet)).Rows), 0; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
 	if got, want := len(set.Rows), 1; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}

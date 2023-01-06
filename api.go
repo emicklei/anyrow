@@ -75,13 +75,18 @@ func FetchRowSet(ctx context.Context, conn Querier, tableName string, pkv Primar
 		metaCache.Set(tableName, mset, cache.DefaultExpiration)
 		set = mset
 	}
+	tset := set.(*pb.RowSet)
 	collector := &rowsetCollector{
-		set: set.(*pb.RowSet),
+		// create a new with metadata from the cached set
+		set: &pb.RowSet{
+			TableName:     tset.TableName,
+			ColumnSchemas: tset.ColumnSchemas,
+		},
 	}
 	filter := fetchFilter{
 		pkv: pkv,
 	}
-	err := fetchValues(ctx, conn, collector.set, filter, collector)
+	err := fetchValues(ctx, conn, tset, filter, collector)
 	return collector.set, err
 }
 
