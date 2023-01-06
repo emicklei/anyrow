@@ -8,10 +8,18 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
+func FilterLimit(limit int) filterOption {
+	return func(f fetchFilter) fetchFilter {
+		f.limit = limit
+		return f
+	}
+}
+
 // Object represents a Table row as a Map.
 type Object map[string]any
 
-func FilterObjects(ctx context.Context, conn Querier, tableName string, where string) ([]Object, error) {
+// FilterObjects queries a table using a WHERE clause. DefaultLimit is used.
+func FilterObjects(ctx context.Context, conn Querier, tableName string, where string, options ...filterOption) ([]Object, error) {
 	set, ok := metaCache.Get(tableName)
 	if !ok {
 		mset, err := getMetadata(ctx, conn, tableName)
@@ -26,6 +34,10 @@ func FilterObjects(ctx context.Context, conn Querier, tableName string, where st
 	}
 	filter := fetchFilter{
 		where: where,
+		limit: 1000,
+	}
+	for _, each := range options {
+		filter = each(filter)
 	}
 	err := fetchValues(ctx, conn, collector.set, filter, collector)
 	return collector.list, err

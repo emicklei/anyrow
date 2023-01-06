@@ -5,24 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"strconv"
 	"strings"
 
 	"github.com/emicklei/anyrow/pb"
 	"github.com/jackc/pgconn"
 )
 
-func composeQueryParams(count int) string {
-	qb := new(strings.Builder)
-	for i := 1; i <= count; i++ {
-		if i > 1 {
-			qb.WriteRune(',')
-		}
-		qb.WriteRune('$')
-		qb.WriteString(strconv.Itoa(i))
-	}
-	return qb.String()
-}
+var defaultFilterLimit = 1000
 
 func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, filter fetchFilter, collector valueCollector) error {
 	// get values
@@ -38,7 +27,9 @@ func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, filter f
 	qb.WriteString(metaSet.TableName)
 	qb.WriteString(" WHERE ")
 	filter.whereOn(qb)
-
+	if len(filter.pkv.Values) == 0 {
+		filter.limitOn(qb)
+	}
 	dbrows, err := conn.Query(ctx, qb.String(), filter.pkv.Values...) // values can be empty
 	if err != nil {
 		return err

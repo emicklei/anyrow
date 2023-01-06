@@ -2,12 +2,16 @@ package anyrow
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
+
+type filterOption func(f fetchFilter) fetchFilter
 
 type fetchFilter struct {
 	pkv   PrimaryKeyAndValues
 	where string
+	limit int
 }
 
 func (f fetchFilter) whereOn(b *strings.Builder) {
@@ -22,4 +26,23 @@ func (f fetchFilter) whereOn(b *strings.Builder) {
 	}
 	// both empty
 	b.WriteString("true")
+}
+
+func (f fetchFilter) limitOn(b *strings.Builder) {
+	if f.limit > 0 {
+		b.WriteString(" LIMIT ")
+		b.WriteString(strconv.Itoa(f.limit))
+	}
+}
+
+func composeQueryParams(count int) string {
+	qb := new(strings.Builder)
+	for i := 1; i <= count; i++ {
+		if i > 1 {
+			qb.WriteRune(',')
+		}
+		qb.WriteRune('$')
+		qb.WriteString(strconv.Itoa(i))
+	}
+	return qb.String()
 }
