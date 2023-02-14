@@ -50,3 +50,31 @@ WHERE table_name = $1;
 	}
 	return set, nil
 }
+
+func getTablenames(ctx context.Context, conn Querier, schema string) ([]string, error) {
+	query := `
+	SELECT table_name
+	FROM information_schema.tables
+   	WHERE table_schema=$1
+		AND table_type='BASE TABLE'`
+
+	rows, err := conn.Query(ctx, query, schema)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	names := []string{}
+	for rows.Next() {
+		var tableName string
+		if err := rows.Scan(&tableName); err != nil {
+			var pgErr *pgconn.PgError
+			if errors.As(err, &pgErr) {
+				fmt.Println(pgErr.Message) // => syntax error at end of input
+				fmt.Println(pgErr.Code)    // => 42601
+			}
+			return names, err
+		}
+		names = append(names, tableName)
+	}
+	return names, nil
+}

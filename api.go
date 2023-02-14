@@ -43,6 +43,11 @@ func FilterObjects(ctx context.Context, conn Querier, tableName string, where st
 	return collector.list, err
 }
 
+// FetchTablenames returns a list of public tablenames.
+func FetchTablenames(ctx context.Context, conn Querier) ([]string, error) {
+	return getTablenames(ctx, conn, "public")
+}
+
 // FetchObjects returns a list of Objects (generic maps) for the given list primary key values.
 func FetchObjects(ctx context.Context, conn Querier, tableName string, pkv PrimaryKeyAndValues) ([]Object, error) {
 	set, ok := metaCache.Get(tableName)
