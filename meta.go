@@ -51,7 +51,7 @@ WHERE table_name = $1;
 	return set, nil
 }
 
-func getTablenames(ctx context.Context, conn Querier, schema string) ([]string, error) {
+func getTableNames(ctx context.Context, conn Querier, schema string) ([]string, error) {
 	query := `
 	SELECT table_name
 	FROM information_schema.tables

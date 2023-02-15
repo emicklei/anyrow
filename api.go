@@ -44,8 +44,17 @@ func FilterObjects(ctx context.Context, conn Querier, tableName string, where st
 }
 
 // FetchTablenames returns a list of public tablenames.
-func FetchTablenames(ctx context.Context, conn Querier) ([]string, error) {
-	return getTablenames(ctx, conn, "public")
+func FetchTableNames(ctx context.Context, conn Querier) ([]string, error) {
+	return getTableNames(ctx, conn, "public")
+}
+
+// FetchColumns returns a list of column schemas for a public tablename.
+func FetchColumns(ctx context.Context, conn Querier, tableName string) ([]*pb.ColumnSchema, error) {
+	set, err := getMetadata(ctx, conn, tableName)
+	if err != nil {
+		return []*pb.ColumnSchema{}, err
+	}
+	return set.ColumnSchemas, nil
 }
 
 // FetchObjects returns a list of Objects (generic maps) for the given list primary key values.
