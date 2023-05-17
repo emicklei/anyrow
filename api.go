@@ -2,10 +2,10 @@ package anyrow
 
 import (
 	"context"
+	"errors"
 
 	"github.com/emicklei/anyrow/pb"
 	pgx "github.com/jackc/pgx/v5"
-	"github.com/patrickmn/go-cache"
 )
 
 func FilterLimit(limit int) filterOption {
@@ -26,7 +26,7 @@ func FilterObjects(ctx context.Context, conn Querier, tableName string, where st
 		if err != nil {
 			return nil, err
 		}
-		metaCache.Set(tableName, mset, cache.DefaultExpiration)
+		metaCache.Set(tableName, mset, defaultExpiration)
 		set = mset
 	}
 	collector := &objectCollector{
@@ -35,6 +35,9 @@ func FilterObjects(ctx context.Context, conn Querier, tableName string, where st
 	filter := fetchFilter{
 		where: where,
 		limit: 1000,
+	}
+	if filter.limit <= 0 {
+		return nil, errors.New("limit parameter must be greater than zero")
 	}
 	for _, each := range options {
 		filter = each(filter)
@@ -65,7 +68,7 @@ func FetchObjects(ctx context.Context, conn Querier, tableName string, pkv Prima
 		if err != nil {
 			return nil, err
 		}
-		metaCache.Set(tableName, mset, cache.DefaultExpiration)
+		metaCache.Set(tableName, mset, defaultExpiration)
 		set = mset
 	}
 	collector := &objectCollector{
@@ -86,7 +89,7 @@ func FetchRowSet(ctx context.Context, conn Querier, tableName string, pkv Primar
 		if err != nil {
 			return nil, err
 		}
-		metaCache.Set(tableName, mset, cache.DefaultExpiration)
+		metaCache.Set(tableName, mset, defaultExpiration)
 		set = mset
 	}
 	tset := set.(*pb.RowSet)

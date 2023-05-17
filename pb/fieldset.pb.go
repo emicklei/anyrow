@@ -341,53 +341,6 @@ func (*ColumnValue_ArrayValue) isColumnValue_JsonValue() {}
 
 func (*ColumnValue_BoolValue) isColumnValue_JsonValue() {}
 
-type T struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	CustomValues map[string]string `protobuf:"bytes,1,rep,name=custom_values,json=customValues,proto3" json:"custom_values,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-}
-
-func (x *T) Reset() {
-	*x = T{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_fieldset_proto_msgTypes[4]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *T) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*T) ProtoMessage() {}
-
-func (x *T) ProtoReflect() protoreflect.Message {
-	mi := &file_fieldset_proto_msgTypes[4]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use T.ProtoReflect.Descriptor instead.
-func (*T) Descriptor() ([]byte, []int) {
-	return file_fieldset_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *T) GetCustomValues() map[string]string {
-	if x != nil {
-		return x.CustomValues
-	}
-	return nil
-}
-
 var File_fieldset_proto protoreflect.FileDescriptor
 
 var file_fieldset_proto_rawDesc = []byte{
@@ -429,17 +382,8 @@ var file_fieldset_proto_rawDesc = []byte{
 	0x09, 0x48, 0x00, 0x52, 0x0a, 0x61, 0x72, 0x72, 0x61, 0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12,
 	0x1f, 0x0a, 0x0a, 0x62, 0x6f, 0x6f, 0x6c, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x06, 0x20,
 	0x01, 0x28, 0x08, 0x48, 0x00, 0x52, 0x09, 0x62, 0x6f, 0x6f, 0x6c, 0x56, 0x61, 0x6c, 0x75, 0x65,
-	0x42, 0x0c, 0x0a, 0x0a, 0x6a, 0x73, 0x6f, 0x6e, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x86,
-	0x01, 0x0a, 0x01, 0x54, 0x12, 0x40, 0x0a, 0x0d, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x5f, 0x76,
-	0x61, 0x6c, 0x75, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x61, 0x6e,
-	0x79, 0x72, 0x6f, 0x77, 0x2e, 0x54, 0x2e, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x56, 0x61, 0x6c,
-	0x75, 0x65, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x0c, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d,
-	0x56, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x1a, 0x3f, 0x0a, 0x11, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d,
-	0x56, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b,
-	0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a,
-	0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61,
-	0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x42, 0x05, 0x5a, 0x03, 0x2f, 0x70, 0x62, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x42, 0x0c, 0x0a, 0x0a, 0x6a, 0x73, 0x6f, 0x6e, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x42, 0x05,
+	0x5a, 0x03, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -454,25 +398,22 @@ func file_fieldset_proto_rawDescGZIP() []byte {
 	return file_fieldset_proto_rawDescData
 }
 
-var file_fieldset_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_fieldset_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_fieldset_proto_goTypes = []interface{}{
 	(*RowSet)(nil),       // 0: anyrow.RowSet
 	(*ColumnSchema)(nil), // 1: anyrow.ColumnSchema
 	(*Row)(nil),          // 2: anyrow.Row
 	(*ColumnValue)(nil),  // 3: anyrow.ColumnValue
-	(*T)(nil),            // 4: anyrow.T
-	nil,                  // 5: anyrow.T.CustomValuesEntry
 }
 var file_fieldset_proto_depIdxs = []int32{
 	1, // 0: anyrow.RowSet.column_schemas:type_name -> anyrow.ColumnSchema
 	2, // 1: anyrow.RowSet.rows:type_name -> anyrow.Row
 	3, // 2: anyrow.Row.columns:type_name -> anyrow.ColumnValue
-	5, // 3: anyrow.T.custom_values:type_name -> anyrow.T.CustomValuesEntry
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_fieldset_proto_init() }
@@ -529,18 +470,6 @@ func file_fieldset_proto_init() {
 				return nil
 			}
 		}
-		file_fieldset_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*T); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
 	}
 	file_fieldset_proto_msgTypes[3].OneofWrappers = []interface{}{
 		(*ColumnValue_StringValue)(nil),
@@ -556,7 +485,7 @@ func file_fieldset_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_fieldset_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -35,7 +35,3 @@ message ColumnValue {
   }
 }
 
-message T {
-  map <string,string> custom_values = 1;
-}
-

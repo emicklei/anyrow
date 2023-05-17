@@ -13,8 +13,10 @@ import (
 
 var metaCache *cache.Cache
 
+var defaultExpiration = 5 * time.Minute
+
 func init() {
-	metaCache = cache.New(5*time.Minute, 10*time.Minute)
+	metaCache = cache.New(defaultExpiration, 10*time.Minute)
 }
 
 func getMetadata(ctx context.Context, conn Querier, tableName string) (*pb.RowSet, error) {
