@@ -52,7 +52,7 @@ WHERE table_name = $2;
 			}
 			return nil, err
 		}
-		fmt.Println(columnName, dataType, isNullable, isPrimary)
+		//fmt.Println(columnName, dataType, isNullable, isPrimary)
 		set.ColumnSchemas = append(set.ColumnSchemas, &pb.ColumnSchema{
 			Name:         columnName,
 			TypeName:     dataType,
