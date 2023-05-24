@@ -85,6 +85,61 @@ func (x *RowSet) GetRows() []*Row {
 	return nil
 }
 
+type RowWithSchema struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Schemas []*ColumnSchema `protobuf:"bytes,1,rep,name=schemas,proto3" json:"schemas,omitempty"`
+	Columns []*ColumnValue  `protobuf:"bytes,2,rep,name=columns,proto3" json:"columns,omitempty"`
+}
+
+func (x *RowWithSchema) Reset() {
+	*x = RowWithSchema{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_fieldset_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RowWithSchema) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RowWithSchema) ProtoMessage() {}
+
+func (x *RowWithSchema) ProtoReflect() protoreflect.Message {
+	mi := &file_fieldset_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RowWithSchema.ProtoReflect.Descriptor instead.
+func (*RowWithSchema) Descriptor() ([]byte, []int) {
+	return file_fieldset_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *RowWithSchema) GetSchemas() []*ColumnSchema {
+	if x != nil {
+		return x.Schemas
+	}
+	return nil
+}
+
+func (x *RowWithSchema) GetColumns() []*ColumnValue {
+	if x != nil {
+		return x.Columns
+	}
+	return nil
+}
+
 type ColumnSchema struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -99,7 +154,7 @@ type ColumnSchema struct {
 func (x *ColumnSchema) Reset() {
 	*x = ColumnSchema{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_fieldset_proto_msgTypes[1]
+		mi := &file_fieldset_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -112,7 +167,7 @@ func (x *ColumnSchema) String() string {
 func (*ColumnSchema) ProtoMessage() {}
 
 func (x *ColumnSchema) ProtoReflect() protoreflect.Message {
-	mi := &file_fieldset_proto_msgTypes[1]
+	mi := &file_fieldset_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -125,7 +180,7 @@ func (x *ColumnSchema) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ColumnSchema.ProtoReflect.Descriptor instead.
 func (*ColumnSchema) Descriptor() ([]byte, []int) {
-	return file_fieldset_proto_rawDescGZIP(), []int{1}
+	return file_fieldset_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ColumnSchema) GetName() string {
@@ -167,7 +222,7 @@ type Row struct {
 func (x *Row) Reset() {
 	*x = Row{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_fieldset_proto_msgTypes[2]
+		mi := &file_fieldset_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -180,7 +235,7 @@ func (x *Row) String() string {
 func (*Row) ProtoMessage() {}
 
 func (x *Row) ProtoReflect() protoreflect.Message {
-	mi := &file_fieldset_proto_msgTypes[2]
+	mi := &file_fieldset_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -193,7 +248,7 @@ func (x *Row) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Row.ProtoReflect.Descriptor instead.
 func (*Row) Descriptor() ([]byte, []int) {
-	return file_fieldset_proto_rawDescGZIP(), []int{2}
+	return file_fieldset_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Row) GetColumns() []*ColumnValue {
@@ -223,7 +278,7 @@ type ColumnValue struct {
 func (x *ColumnValue) Reset() {
 	*x = ColumnValue{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_fieldset_proto_msgTypes[3]
+		mi := &file_fieldset_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -236,7 +291,7 @@ func (x *ColumnValue) String() string {
 func (*ColumnValue) ProtoMessage() {}
 
 func (x *ColumnValue) ProtoReflect() protoreflect.Message {
-	mi := &file_fieldset_proto_msgTypes[3]
+	mi := &file_fieldset_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -249,7 +304,7 @@ func (x *ColumnValue) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ColumnValue.ProtoReflect.Descriptor instead.
 func (*ColumnValue) Descriptor() ([]byte, []int) {
-	return file_fieldset_proto_rawDescGZIP(), []int{3}
+	return file_fieldset_proto_rawDescGZIP(), []int{4}
 }
 
 func (m *ColumnValue) GetJsonValue() isColumnValue_JsonValue {
@@ -354,6 +409,13 @@ var file_fieldset_proto_rawDesc = []byte{
 	0x52, 0x0d, 0x63, 0x6f, 0x6c, 0x75, 0x6d, 0x6e, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x73, 0x12,
 	0x1f, 0x0a, 0x04, 0x72, 0x6f, 0x77, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0b, 0x2e,
 	0x61, 0x6e, 0x79, 0x72, 0x6f, 0x77, 0x2e, 0x52, 0x6f, 0x77, 0x52, 0x04, 0x72, 0x6f, 0x77, 0x73,
+	0x22, 0x6e, 0x0a, 0x0d, 0x52, 0x6f, 0x77, 0x57, 0x69, 0x74, 0x68, 0x53, 0x63, 0x68, 0x65, 0x6d,
+	0x61, 0x12, 0x2e, 0x0a, 0x07, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x73, 0x18, 0x01, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x14, 0x2e, 0x61, 0x6e, 0x79, 0x72, 0x6f, 0x77, 0x2e, 0x43, 0x6f, 0x6c, 0x75,
+	0x6d, 0x6e, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52, 0x07, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61,
+	0x73, 0x12, 0x2d, 0x0a, 0x07, 0x63, 0x6f, 0x6c, 0x75, 0x6d, 0x6e, 0x73, 0x18, 0x02, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x13, 0x2e, 0x61, 0x6e, 0x79, 0x72, 0x6f, 0x77, 0x2e, 0x43, 0x6f, 0x6c, 0x75,
+	0x6d, 0x6e, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x07, 0x63, 0x6f, 0x6c, 0x75, 0x6d, 0x6e, 0x73,
 	0x22, 0x85, 0x01, 0x0a, 0x0c, 0x43, 0x6f, 0x6c, 0x75, 0x6d, 0x6e, 0x53, 0x63, 0x68, 0x65, 0x6d,
 	0x61, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x1b, 0x0a, 0x09, 0x74, 0x79, 0x70, 0x65, 0x5f, 0x6e, 0x61,
@@ -398,22 +460,25 @@ func file_fieldset_proto_rawDescGZIP() []byte {
 	return file_fieldset_proto_rawDescData
 }
 
-var file_fieldset_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_fieldset_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_fieldset_proto_goTypes = []interface{}{
-	(*RowSet)(nil),       // 0: anyrow.RowSet
-	(*ColumnSchema)(nil), // 1: anyrow.ColumnSchema
-	(*Row)(nil),          // 2: anyrow.Row
-	(*ColumnValue)(nil),  // 3: anyrow.ColumnValue
+	(*RowSet)(nil),        // 0: anyrow.RowSet
+	(*RowWithSchema)(nil), // 1: anyrow.RowWithSchema
+	(*ColumnSchema)(nil),  // 2: anyrow.ColumnSchema
+	(*Row)(nil),           // 3: anyrow.Row
+	(*ColumnValue)(nil),   // 4: anyrow.ColumnValue
 }
 var file_fieldset_proto_depIdxs = []int32{
-	1, // 0: anyrow.RowSet.column_schemas:type_name -> anyrow.ColumnSchema
-	2, // 1: anyrow.RowSet.rows:type_name -> anyrow.Row
-	3, // 2: anyrow.Row.columns:type_name -> anyrow.ColumnValue
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	2, // 0: anyrow.RowSet.column_schemas:type_name -> anyrow.ColumnSchema
+	3, // 1: anyrow.RowSet.rows:type_name -> anyrow.Row
+	2, // 2: anyrow.RowWithSchema.schemas:type_name -> anyrow.ColumnSchema
+	4, // 3: anyrow.RowWithSchema.columns:type_name -> anyrow.ColumnValue
+	4, // 4: anyrow.Row.columns:type_name -> anyrow.ColumnValue
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_fieldset_proto_init() }
@@ -435,7 +500,7 @@ func file_fieldset_proto_init() {
 			}
 		}
 		file_fieldset_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ColumnSchema); i {
+			switch v := v.(*RowWithSchema); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -447,7 +512,7 @@ func file_fieldset_proto_init() {
 			}
 		}
 		file_fieldset_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Row); i {
+			switch v := v.(*ColumnSchema); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -459,6 +524,18 @@ func file_fieldset_proto_init() {
 			}
 		}
 		file_fieldset_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Row); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_fieldset_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ColumnValue); i {
 			case 0:
 				return &v.state
@@ -471,7 +548,7 @@ func file_fieldset_proto_init() {
 			}
 		}
 	}
-	file_fieldset_proto_msgTypes[3].OneofWrappers = []interface{}{
+	file_fieldset_proto_msgTypes[4].OneofWrappers = []interface{}{
 		(*ColumnValue_StringValue)(nil),
 		(*ColumnValue_NumberFloatValue)(nil),
 		(*ColumnValue_NumberIntegerValue)(nil),
@@ -485,7 +562,7 @@ func file_fieldset_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_fieldset_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

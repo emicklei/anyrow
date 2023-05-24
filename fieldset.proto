@@ -12,6 +12,11 @@ message RowSet {
   repeated Row          rows           = 3;
 }
 
+message RowWithSchema {
+  repeated ColumnSchema schemas = 1;
+  repeated ColumnValue  columns = 2;
+}
+
 message ColumnSchema {
   string name          = 1;
   string type_name     = 2;
