@@ -21,11 +21,19 @@ func init() {
 
 func getMetadata(ctx context.Context, conn Querier, tableName string) (*pb.RowSet, error) {
 	query := `
-SELECT column_name, data_type, is_nullable
-FROM information_schema.columns
-WHERE table_name = $1;
+SELECT column_name, data_type, is_nullable,
+	EXISTS (
+		SELECT 1
+		FROM pg_constraint c
+		JOIN pg_attribute a ON a.attnum = ANY(c.conkey) AND a.attrelid = c.conrelid
+		WHERE c.contype = 'p'
+		  AND c.conrelid = CAST($1 as regclass)
+		  AND a.attname = isc.column_name
+	) AS isPrimary
+FROM information_schema.columns isc
+WHERE table_name = $2;
 `
-	rows, err := conn.Query(ctx, query, tableName)
+	rows, err := conn.Query(ctx, query, tableName, tableName)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +43,8 @@ WHERE table_name = $1;
 	set.TableName = tableName
 	for rows.Next() {
 		var columnName, dataType, isNullable string
-		if err := rows.Scan(&columnName, &dataType, &isNullable); err != nil {
+		var isPrimary bool
+		if err := rows.Scan(&columnName, &dataType, &isNullable, &isPrimary); err != nil {
 			var pgErr *pgconn.PgError
 			if errors.As(err, &pgErr) {
 				fmt.Println(pgErr.Message) // => syntax error at end of input
@@ -43,11 +52,12 @@ WHERE table_name = $1;
 			}
 			return nil, err
 		}
+		fmt.Println(columnName, dataType, isNullable, isPrimary)
 		set.ColumnSchemas = append(set.ColumnSchemas, &pb.ColumnSchema{
 			Name:         columnName,
 			TypeName:     dataType,
 			IsNullable:   isNullable == "YES",
-			IsPrimarykey: false,
+			IsPrimarykey: isPrimary,
 		})
 	}
 	return set, nil
