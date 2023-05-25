@@ -25,6 +25,8 @@ func (x *RowSet) JSONString() string {
 // index: The index of the row to be encoded.
 //
 // string: A string representation of the row in JSON format.
+//
+// options: The JSON output options.
 func (x *RowSet) RowJSONString(index int) string {
 	buf := new(strings.Builder)
 	enc := json.NewEncoder(buf)
@@ -52,16 +54,18 @@ func (x *RowSet) encodeRowOn(rowIndex int, enc *json.Encoder, buf *strings.Build
 			enc.Encode(other.GetNumberIntegerValue())
 		case *ColumnValue_ObjectValue:
 			buf.WriteString(other.GetObjectValue())
+			buf.WriteRune('\n')
 		case *ColumnValue_ArrayValue:
 			buf.WriteString(other.GetArrayValue())
+			buf.WriteRune('\n')
 		case *ColumnValue_BoolValue:
 			if other.GetBoolValue() {
-				buf.WriteString("true")
+				buf.WriteString("true\n")
 			} else {
-				buf.WriteString("false")
+				buf.WriteString("false\n")
 			}
 		default:
-			buf.WriteString("null")
+			buf.WriteString("null\n")
 		}
 	}
 	buf.WriteRune('}')
