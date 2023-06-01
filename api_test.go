@@ -74,7 +74,7 @@ func TestFilterObjectsLimit(t *testing.T) {
 func TestFetchObjects(t *testing.T) {
 	ctx := context.Background()
 	conn := new(mockQuerier)
-	pkv := MakePrimaryKeyAndValues("id", "1", "2")
+	pkv := NewPrimaryKeyAndValues("id", "1", "2")
 	list, err := FetchObjects(ctx, conn, "test", pkv)
 	if err != nil {
 		t.Fatal(err)
@@ -93,7 +93,7 @@ func TestFetchObjects(t *testing.T) {
 func TestFetchRowSet(t *testing.T) {
 	ctx := context.Background()
 	conn := new(mockQuerier)
-	pkv := MakePrimaryKeyAndValues("id", "1", "2")
+	pkv := NewPrimaryKeyAndValues("id", "1", "2")
 	set, err := FetchRowSet(ctx, conn, "test", pkv)
 	if err != nil {
 		t.Fatal(err)

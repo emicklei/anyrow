@@ -3,6 +3,7 @@ package anyrow
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/emicklei/anyrow/pb"
 	pgx "github.com/jackc/pgx/v5"
@@ -61,7 +62,7 @@ func FetchColumns(ctx context.Context, conn Querier, tableName string) ([]*pb.Co
 }
 
 // FetchObjects returns a list of Objects (generic maps) for the given list primary key values.
-func FetchObjects(ctx context.Context, conn Querier, tableName string, pkv PrimaryKeyAndValues) ([]Object, error) {
+func FetchObjects(ctx context.Context, conn Querier, tableName string, pkv PrimaryKeysAndValues) ([]Object, error) {
 	set, ok := metaCache.Get(tableName)
 	if !ok {
 		mset, err := getMetadata(ctx, conn, tableName)
@@ -82,7 +83,7 @@ func FetchObjects(ctx context.Context, conn Querier, tableName string, pkv Prima
 }
 
 // FetchObjects returns a protobuf RowSet for the given list primary key values.
-func FetchRowSet(ctx context.Context, conn Querier, tableName string, pkv PrimaryKeyAndValues) (*pb.RowSet, error) {
+func FetchRowSet(ctx context.Context, conn Querier, tableName string, pkv PrimaryKeysAndValues) (*pb.RowSet, error) {
 	set, ok := metaCache.Get(tableName)
 	if !ok {
 		mset, err := getMetadata(ctx, conn, tableName)
@@ -112,13 +113,50 @@ type Querier interface {
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
 }
 
-// PrimaryKeyAndValues is a parameter object holding the column name and one or more values.
-type PrimaryKeyAndValues struct {
-	Column string
-	Values []any
+// PrimaryKeysAndValues is a parameter object holding the column name(s) and one or more values.
+type PrimaryKeysAndValues struct {
+	// either a single column with many values
+	column string
+	values []any
+	// or pairs
+	pairs []PrimaryKeyAndValue
 }
 
-// MakePrimaryKeyAndValues creates a parameter object.
-func MakePrimaryKeyAndValues(column string, value ...any) PrimaryKeyAndValues {
-	return PrimaryKeyAndValues{Column: column, Values: value}
+func (pkv PrimaryKeysAndValues) hasValues() bool {
+	return len(pkv.values) > 0 || len(pkv.pairs) > 0
+}
+
+func (pkv PrimaryKeysAndValues) parameterValues() (list []any) {
+	if pkv.column != "" {
+		return pkv.values
+	}
+	// use pairs
+	for _, each := range pkv.pairs {
+		list = append(list, each.Value)
+	}
+	return
+}
+
+type PrimaryKeyAndValue struct {
+	Column string
+	Value  any
+}
+
+func (pkv PrimaryKeyAndValue) String() string {
+	return fmt.Sprintf("%s=%v", pkv.Column, pkv.Value)
+}
+
+// NewPrimaryKeyAndValue creates a parameter object.
+func NewPrimaryKeyAndValue(column string, value any) PrimaryKeyAndValue {
+	return PrimaryKeyAndValue{Column: column, Value: value}
+}
+
+// NewPrimaryKeyAndValues creates a parameter object.
+func NewPrimaryKeyAndValues(column string, value ...any) PrimaryKeysAndValues {
+	return PrimaryKeysAndValues{column: column, values: value}
+}
+
+// MewPrimaryKeysAndValues creates a parameter object.
+func NewPrimaryKeysAndValues(pairs []PrimaryKeyAndValue) PrimaryKeysAndValues {
+	return PrimaryKeysAndValues{pairs: pairs}
 }

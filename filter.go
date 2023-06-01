@@ -9,15 +9,31 @@ import (
 type filterOption func(f fetchFilter) fetchFilter
 
 type fetchFilter struct {
-	pkv   PrimaryKeyAndValues
+	pkv   PrimaryKeysAndValues
 	where string
 	limit int
 }
 
 func (f fetchFilter) whereOn(b *strings.Builder) {
-	if len(f.pkv.Values) > 0 {
-		b.WriteString(f.pkv.Column)
-		fmt.Fprintf(b, " IN (%s)", composeQueryParams(len(f.pkv.Values)))
+	// either one key with one or more values
+	if f.pkv.column != "" {
+		b.WriteString(f.pkv.column)
+		fmt.Fprintf(b, " IN (%s)", composeQueryParams(len(f.pkv.values)))
+		return
+	}
+	// or multiple keys with one value or more values
+	if len(f.pkv.pairs) > 1 {
+		// chain of ORs:  (p1=v1 and p2=v2)
+		b.WriteRune('(')
+		p := 1
+		for i, each := range f.pkv.pairs {
+			if i > 0 {
+				b.WriteString(" AND ")
+			}
+			fmt.Fprintf(b, "%s=$%d", each.Column, p)
+			p++
+		}
+		b.WriteRune(')')
 		return
 	}
 	if f.where != "" {

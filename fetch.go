@@ -27,10 +27,10 @@ func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, filter f
 	qb.WriteString(metaSet.TableName)
 	qb.WriteString(" WHERE ")
 	filter.whereOn(qb)
-	if len(filter.pkv.Values) == 0 {
+	if !filter.pkv.hasValues() {
 		filter.limitOn(qb)
 	}
-	dbrows, err := conn.Query(ctx, qb.String(), filter.pkv.Values...) // values can be empty
+	dbrows, err := conn.Query(ctx, qb.String(), filter.pkv.parameterValues()...) // parameterValues can be empty
 	if err != nil {
 		return err
 	}
