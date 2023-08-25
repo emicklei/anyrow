@@ -20,14 +20,14 @@ func FilterLimit(limit int) filterOption {
 type Object map[string]any
 
 // FilterObjects queries a table using a WHERE clause. Unless option is given, the limit is 1000.
-func FilterObjects(ctx context.Context, conn Querier, tableName string, where string, options ...filterOption) ([]Object, error) {
-	set, ok := metaCache.Get(tableName)
+func FilterObjects(ctx context.Context, conn Querier, metadataCacheKey, tableName string, where string, options ...filterOption) ([]Object, error) {
+	set, ok := metaCache.Get(metadataCacheKey)
 	if !ok {
 		mset, err := getMetadata(ctx, conn, tableName)
 		if err != nil {
 			return nil, err
 		}
-		metaCache.Set(tableName, mset, defaultExpiration)
+		metaCache.Set(metadataCacheKey, mset, defaultExpiration)
 		set = mset
 	}
 	collector := &objectCollector{
@@ -62,14 +62,14 @@ func FetchColumns(ctx context.Context, conn Querier, tableName string) ([]*pb.Co
 }
 
 // FetchObjects returns a list of Objects (generic maps) for the given list primary key values.
-func FetchObjects(ctx context.Context, conn Querier, tableName string, pkv PrimaryKeysAndValues) ([]Object, error) {
-	set, ok := metaCache.Get(tableName)
+func FetchObjects(ctx context.Context, conn Querier, metadataCacheKey, tableName string, pkv PrimaryKeysAndValues) ([]Object, error) {
+	set, ok := metaCache.Get(metadataCacheKey)
 	if !ok {
 		mset, err := getMetadata(ctx, conn, tableName)
 		if err != nil {
 			return nil, err
 		}
-		metaCache.Set(tableName, mset, defaultExpiration)
+		metaCache.Set(metadataCacheKey, mset, defaultExpiration)
 		set = mset
 	}
 	collector := &objectCollector{
@@ -83,14 +83,14 @@ func FetchObjects(ctx context.Context, conn Querier, tableName string, pkv Prima
 }
 
 // FetchObjects returns a protobuf RowSet for the given list primary key values.
-func FetchRowSet(ctx context.Context, conn Querier, tableName string, pkv PrimaryKeysAndValues) (*pb.RowSet, error) {
-	set, ok := metaCache.Get(tableName)
+func FetchRowSet(ctx context.Context, conn Querier, metadataCacheKey, tableName string, pkv PrimaryKeysAndValues) (*pb.RowSet, error) {
+	set, ok := metaCache.Get(metadataCacheKey)
 	if !ok {
 		mset, err := getMetadata(ctx, conn, tableName)
 		if err != nil {
 			return nil, err
 		}
-		metaCache.Set(tableName, mset, defaultExpiration)
+		metaCache.Set(metadataCacheKey, mset, defaultExpiration)
 		set = mset
 	}
 	tset := set.(*pb.RowSet)

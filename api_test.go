@@ -25,14 +25,14 @@ func TestMain(m *testing.M) {
 		IsNullable:   true,
 		IsPrimarykey: false,
 	})
-	metaCache.Set("test", set, cache.DefaultExpiration)
+	metaCache.Set("testkey", set, cache.DefaultExpiration)
 	m.Run()
 }
 
 func TestFilterObjects(t *testing.T) {
 	ctx := context.Background()
 	conn := new(mockQuerier)
-	list, err := FilterObjects(ctx, conn, "test", "id = 1")
+	list, err := FilterObjects(ctx, conn, "testkey", "test", "id = 1")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,7 +47,7 @@ func TestFilterObjects(t *testing.T) {
 func TestFilterObjectsEmptyWhere(t *testing.T) {
 	ctx := context.Background()
 	conn := new(mockQuerier)
-	list, err := FilterObjects(ctx, conn, "test", "")
+	list, err := FilterObjects(ctx, conn, "testkey", "test", "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -62,7 +62,7 @@ func TestFilterObjectsEmptyWhere(t *testing.T) {
 func TestFilterObjectsLimit(t *testing.T) {
 	ctx := context.Background()
 	conn := new(mockQuerier)
-	_, err := FilterObjects(ctx, conn, "test", "", FilterLimit(3))
+	_, err := FilterObjects(ctx, conn, "testkey", "test", "", FilterLimit(3))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,7 +75,7 @@ func TestFetchObjects(t *testing.T) {
 	ctx := context.Background()
 	conn := new(mockQuerier)
 	pkv := NewPrimaryKeyAndValues("id", "1", "2")
-	list, err := FetchObjects(ctx, conn, "test", pkv)
+	list, err := FetchObjects(ctx, conn, "testkey", "test", pkv)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,11 +94,11 @@ func TestFetchRowSet(t *testing.T) {
 	ctx := context.Background()
 	conn := new(mockQuerier)
 	pkv := NewPrimaryKeyAndValues("id", "1", "2")
-	set, err := FetchRowSet(ctx, conn, "test", pkv)
+	set, err := FetchRowSet(ctx, conn, "testkey", "test", pkv)
 	if err != nil {
 		t.Fatal(err)
 	}
-	cachedSet, _ := metaCache.Get("test")
+	cachedSet, _ := metaCache.Get("testkey")
 	if got, want := len((cachedSet.(*pb.RowSet)).Rows), 0; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
