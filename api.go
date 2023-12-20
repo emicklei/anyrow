@@ -9,6 +9,23 @@ import (
 	pgx "github.com/jackc/pgx/v5"
 )
 
+var schemaKey = struct{ key string }{"_anyrow_schema"}
+
+// ContextWithSchema returns a Context for accessing (meta)data in a given dataschema.
+// If a context does not have a schema associated then 'public' is used as the schema.
+func ContextWithSchema(ctx context.Context, schema string) context.Context {
+	return context.WithValue(ctx, schemaKey, schema)
+}
+
+// SchemaFromContext returns the database schema associated with the context. If missing then return 'public'.
+func SchemaFromContext(ctx context.Context) string {
+	v, ok := ctx.Value(schemaKey).(string)
+	if !ok {
+		return "public"
+	}
+	return v
+}
+
 func FilterLimit(limit int) filterOption {
 	return func(f fetchFilter) fetchFilter {
 		f.limit = limit
@@ -47,9 +64,13 @@ func FilterObjects(ctx context.Context, conn Querier, metadataCacheKey, tableNam
 	return collector.list, err
 }
 
+func FetchSchemas(ctx context.Context, conn Querier) ([]string, error) {
+	return getSchemaNames(ctx, conn)
+}
+
 // FetchTablenames returns a list of public tablenames.
 func FetchTableNames(ctx context.Context, conn Querier) ([]string, error) {
-	return getTableNames(ctx, conn, "public")
+	return getTableNames(ctx, conn, SchemaFromContext(ctx))
 }
 
 // FetchColumns returns a list of column schemas for a public tablename.

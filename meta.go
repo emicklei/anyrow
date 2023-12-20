@@ -86,7 +86,34 @@ func getTableNames(ctx context.Context, conn Querier, schema string) ([]string, 
 			}
 			return names, err
 		}
-		names = append(names, tableName)
+		names = append(names, fmt.Sprintf("%s.%s", schema, tableName))
+	}
+	return names, nil
+}
+
+func getSchemaNames(ctx context.Context, conn Querier) ([]string, error) {
+	query := `
+	SELECT distinct(table_schema) 
+	FROM information_schema.tables 
+	WHERE table_schema not in('pg_catalog','information_schema')
+	`
+	rows, err := conn.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	names := []string{}
+	for rows.Next() {
+		var schemaName string
+		if err := rows.Scan(&schemaName); err != nil {
+			var pgErr *pgconn.PgError
+			if errors.As(err, &pgErr) {
+				fmt.Println(pgErr.Message) // => syntax error at end of input
+				fmt.Println(pgErr.Code)    // => 42601
+			}
+			return names, err
+		}
+		names = append(names, schemaName)
 	}
 	return names, nil
 }
