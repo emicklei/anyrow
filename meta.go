@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/emicklei/anyrow/pb"
@@ -20,6 +21,11 @@ func init() {
 }
 
 func getMetadata(ctx context.Context, conn Querier, tableName string) (*pb.RowSet, error) {
+	schema := "public"
+	if strings.Contains(tableName, ".") {
+		schema = tableName[:strings.Index(tableName, ".")]
+		tableName = tableName[strings.Index(tableName, ".")+1:]
+	}
 	query := `
 SELECT column_name, data_type, is_nullable,
 	EXISTS (
@@ -31,15 +37,16 @@ SELECT column_name, data_type, is_nullable,
 		  AND a.attname = isc.column_name
 	) AS isPrimary
 FROM information_schema.columns isc
-WHERE table_name = $2;
+WHERE table_name = $2 AND table_schema = $3;
 `
-	rows, err := conn.Query(ctx, query, tableName, tableName)
+	rows, err := conn.Query(ctx, query, tableName, tableName, schema)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
 	set := new(pb.RowSet)
+	set.SchemaName = schema
 	set.TableName = tableName
 	for rows.Next() {
 		var columnName, dataType, isNullable string

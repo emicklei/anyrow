@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"math"
 	"strings"
 
@@ -30,6 +31,8 @@ func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, filter f
 	if !filter.pkv.hasValues() {
 		filter.limitOn(qb)
 	}
+	sql := qb.String()
+	slog.Debug("fetchValues", "sql", sql, "params", filter.pkv.parameterValues())
 	dbrows, err := conn.Query(ctx, qb.String(), filter.pkv.parameterValues()...) // parameterValues can be empty
 	if err != nil {
 		return err
