@@ -5,6 +5,35 @@ import (
 	"strings"
 )
 
+// RowMap returns a map representation of the row at the specified index in the
+// RowSet.
+//
+// rowIndex: The index of the row to be encoded.
+func (x *RowSet) RowMap(rowIndex int) map[string]interface{} {
+	m := make(map[string]interface{}, len(x.Rows[rowIndex].Columns))
+	for i, each := range x.Rows[rowIndex].Columns {
+		key := x.ColumnSchemas[i].Name
+		switch each.GetJsonValue().(type) {
+		case *ColumnValue_StringValue:
+			m[key] = each.GetStringValue()
+		case *ColumnValue_NumberFloatValue:
+			m[key] = each.GetNumberFloatValue()
+		case *ColumnValue_NumberIntegerValue:
+			m[key] = each.GetNumberIntegerValue()
+		case *ColumnValue_ObjectValue:
+			m[key] = each.GetObjectValue()
+		case *ColumnValue_ArrayValue:
+			m[key] = each.GetArrayValue()
+		case *ColumnValue_BoolValue:
+			m[key] = each.GetBoolValue()
+		default:
+			m[key] = nil
+		}
+	}
+	return m
+}
+
+// JSONString returns a JSON-encoded string representation of the RowSet.
 func (x *RowSet) JSONString() string {
 	buf := new(strings.Builder)
 	buf.WriteRune('[')

@@ -111,6 +111,13 @@ func TestFetchRowSet(t *testing.T) {
 	if got, want := conn.args, []any{"1", "2"}; !reflect.DeepEqual(got, want) {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
+	mp := set.RowMap(0)
+	if got, want := mp["num"], float32(42); got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+	if got, want := mp["str"], "shoesize"; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
 }
 
 type mockQuerier struct {
