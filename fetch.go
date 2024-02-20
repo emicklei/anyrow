@@ -60,7 +60,7 @@ func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, filter f
 			case float64:
 				// check for integer like
 				tn := metaSet.ColumnSchemas[i].TypeName
-				if strings.Contains("integer bigint smallint", tn) {
+				if strings.Contains("integer bigint smallint numeric", tn) {
 					f := each.(float64)
 					fint, _ := math.Modf(f)
 					collector.storeInt64(i, int64(fint))
