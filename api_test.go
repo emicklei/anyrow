@@ -39,7 +39,7 @@ func TestFilterObjects(t *testing.T) {
 	if got, want := len(list), 1; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
-	if got, want := conn.sql, `SELECT to_json("str"),to_json("num") FROM test WHERE id = 1 LIMIT 1000`; got != want {
+	if got, want := conn.sql, `SELECT str,num FROM test WHERE id = 1 LIMIT 1000`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
@@ -54,7 +54,7 @@ func TestFilterObjectsEmptyWhere(t *testing.T) {
 	if got, want := len(list), 1; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
-	if got, want := conn.sql, `SELECT to_json("str"),to_json("num") FROM test WHERE true LIMIT 1000`; got != want {
+	if got, want := conn.sql, `SELECT str,num FROM test WHERE true LIMIT 1000`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
@@ -66,7 +66,7 @@ func TestFilterObjectsLimit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := conn.sql, `SELECT to_json("str"),to_json("num") FROM test WHERE true LIMIT 3`; got != want {
+	if got, want := conn.sql, `SELECT str,num FROM test WHERE true LIMIT 3`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
@@ -82,7 +82,7 @@ func TestFetchObjects(t *testing.T) {
 	if got, want := len(list), 1; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
-	if got, want := conn.sql, `SELECT to_json("str"),to_json("num") FROM test WHERE id IN ($1,$2)`; got != want {
+	if got, want := conn.sql, `SELECT str,num FROM test WHERE id IN ($1,$2)`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 	if got, want := conn.args, []any{"1", "2"}; !reflect.DeepEqual(got, want) {
@@ -105,7 +105,7 @@ func TestFetchRowSet(t *testing.T) {
 	if got, want := len(set.Rows), 1; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
-	if got, want := conn.sql, `SELECT to_json("str"),to_json("num") FROM test WHERE id IN ($1,$2)`; got != want {
+	if got, want := conn.sql, `SELECT str,num FROM test WHERE id IN ($1,$2)`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 	if got, want := conn.args, []any{"1", "2"}; !reflect.DeepEqual(got, want) {

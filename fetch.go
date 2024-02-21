@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"log/slog"
 	"math"
-	"math/big"
 	"strings"
 
 	"github.com/emicklei/anyrow/pb"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 var defaultFilterLimit = 1000
@@ -23,7 +23,7 @@ func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, filter f
 		if i > 0 {
 			qb.WriteRune(',')
 		}
-		fmt.Fprintf(qb, "to_json(\"%s\")", each.Name)
+		fmt.Fprint(qb, each.Name)
 	}
 	qb.WriteString(" FROM ")
 	qb.WriteString(metaSet.TableName)
@@ -58,14 +58,13 @@ func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, filter f
 			switch each.(type) {
 			case string:
 				collector.storeString(i, each.(string))
+			case int64:
+				collector.storeInt64(i, each.(int64))
 			case float64:
+				// TODO why 64->32 ???
 				f := each.(float64)
 				// check for integer like
 				tn := metaSet.ColumnSchemas[i].TypeName
-				if tn == "numeric" {
-					collector.storeBigFloat(i, big.NewFloat(f))
-					continue
-				}
 				if strings.Contains("integer bigint smallint", tn) {
 					fint, _ := math.Modf(f)
 					collector.storeInt64(i, int64(fint))
@@ -77,11 +76,21 @@ func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, filter f
 				collector.storeDefault(i, each)
 			case bool:
 				collector.storeBool(i, each.(bool))
+			case [16]uint8:
+				// handle as pgtype.UUID
+				collector.storeString(i, UUIDToString(each.([16]uint8)))
+			case pgtype.Numeric:
+				collector.storeDefault(i, each)
 			default:
-				fmt.Printf("[anyrow] handled as object: %v %T\n", each, each)
+				slog.Debug("[anyrow] handled as object", "value", each, "value.type", fmt.Sprintf("%T", each))
 				collector.storeDefault(i, each)
 			}
 		}
 	}
 	return nil
+}
+
+// UUIDToString returns format xxxx-yyyy-zzzz-rrrr-tttt
+func UUIDToString(src [16]uint8) string {
+	return fmt.Sprintf("%x-%x-%x-%x-%x", src[0:4], src[4:6], src[6:8], src[8:10], src[10:16])
 }
