@@ -3,6 +3,7 @@ module github.com/emicklei/anyrow
 go 1.19
 
 require (
+	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.5.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	google.golang.org/protobuf v1.31.0

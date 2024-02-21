@@ -2,6 +2,7 @@ package anyrow
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -80,7 +81,9 @@ func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, filter f
 				// handle as pgtype.UUID
 				collector.storeString(i, UUIDToString(each.([16]uint8)))
 			case pgtype.Numeric:
-				collector.storeDefault(i, each)
+				// large numbers need to be quoted
+				data, _ := json.Marshal(each.(pgtype.Numeric))
+				collector.storeString(i, string(data))
 			default:
 				slog.Debug("[anyrow] handled as object", "value", each, "value.type", fmt.Sprintf("%T", each))
 				collector.storeDefault(i, each)
