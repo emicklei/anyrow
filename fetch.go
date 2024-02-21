@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"math"
+	"math/big"
 	"strings"
 
 	"github.com/emicklei/anyrow/pb"
@@ -58,15 +59,19 @@ func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, filter f
 			case string:
 				collector.storeString(i, each.(string))
 			case float64:
+				f := each.(float64)
 				// check for integer like
 				tn := metaSet.ColumnSchemas[i].TypeName
-				if strings.Contains("integer bigint smallint numeric", tn) {
-					f := each.(float64)
+				if tn == "numeric" {
+					collector.storeBigFloat(i, big.NewFloat(f))
+					continue
+				}
+				if strings.Contains("integer bigint smallint", tn) {
 					fint, _ := math.Modf(f)
 					collector.storeInt64(i, int64(fint))
 				} else {
 					// is a float like
-					collector.storeFloat32(i, float32(each.(float64)))
+					collector.storeFloat32(i, float32(f))
 				}
 			case map[string]any, []any:
 				collector.storeDefault(i, each)

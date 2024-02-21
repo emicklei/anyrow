@@ -2,6 +2,7 @@ package anyrow
 
 import (
 	"encoding/json"
+	"math/big"
 
 	"github.com/emicklei/anyrow/pb"
 )
@@ -13,6 +14,7 @@ type valueCollector interface {
 	storeString(index int, value string)
 	storeFloat32(index int, value float32)
 	storeInt64(index int, value int64)
+	storeBigFloat(index int, value *big.Float)
 }
 
 type objectCollector struct {
@@ -35,6 +37,13 @@ func (o *objectCollector) storeFloat32(index int, value float32) {
 }
 func (o *objectCollector) storeInt64(index int, value int64) {
 	o.object[o.set.ColumnSchemas[index].Name] = value
+}
+func (o *objectCollector) storeBigFloat(index int, value *big.Float) {
+	if val, acc := value.Int64(); acc == big.Exact {
+		o.object[o.set.ColumnSchemas[index].Name] = val
+	} else {
+		o.object[o.set.ColumnSchemas[index].Name] = value
+	}
 }
 func (o *objectCollector) nextRow(length int) {
 	o.object = make(map[string]any, length)
@@ -72,6 +81,16 @@ func (r *rowsetCollector) storeInt64(index int, value int64) {
 	cell.JsonValue = &pb.ColumnValue_NumberIntegerValue{NumberIntegerValue: value}
 	r.row.Columns[index] = cell
 }
+func (r *rowsetCollector) storeBigFloat(index int, value *big.Float) {
+	cell := new(pb.ColumnValue)
+	if val, acc := value.Int64(); acc == big.Exact {
+		cell.JsonValue = &pb.ColumnValue_NumberIntegerValue{NumberIntegerValue: val}
+	} else {
+		cell.JsonValue = &pb.ColumnValue_StringValue{StringValue: value.Text('g', 100)}
+	}
+	r.row.Columns[index] = cell
+}
+
 func (r *rowsetCollector) nextRow(length int) {
 	r.row = new(pb.Row)
 	r.row.Columns = make([]*pb.ColumnValue, length)
