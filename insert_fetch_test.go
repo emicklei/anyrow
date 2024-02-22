@@ -1,11 +1,10 @@
-package dbtests
+package anyrow
 
 import (
 	"context"
 	"strconv"
 	"testing"
 
-	"github.com/emicklei/anyrow"
 	"github.com/google/uuid"
 )
 
@@ -33,8 +32,8 @@ func TestInsertThenFetch(t *testing.T) {
 	check(t, err)
 	tx.Commit(ctx)
 
-	pkvs := anyrow.NewPrimaryKeyAndValues("id", id)
-	rows, err := anyrow.FetchObjects(ctx, testConnect, "cache", "fieldbags", pkvs)
+	pkvs := NewPrimaryKeyAndValues("id", id)
+	rows, err := FetchObjects(ctx, testConnect, "cache", "fieldbags", pkvs)
 	check(t, err)
 	t.Log(rows)
 	t.Log(rows[0]["id"])

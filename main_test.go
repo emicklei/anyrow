@@ -1,4 +1,4 @@
-package dbtests
+package anyrow
 
 import (
 	"context"
@@ -6,14 +6,16 @@ import (
 	"os"
 	"testing"
 
+	"github.com/emicklei/anyrow/pb"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/patrickmn/go-cache"
 )
 
 var testConnect *pgx.Conn
 
 func TestMain(m *testing.M) {
-	os.Setenv("ANYROW_CONN", "postgres://postgres:anyrowdb@localhost:7432/postgres")
+	setupTestKey()
 	connectionString := os.Getenv("ANYROW_CONN")
 	if len(connectionString) == 0 {
 		println("no database env set")
@@ -67,4 +69,22 @@ func ensureTables(conn *pgx.Conn) error {
 		return err
 	}
 	return tx.Commit(ctx)
+}
+
+func setupTestKey() {
+	set := new(pb.RowSet)
+	set.TableName = "test"
+	set.ColumnSchemas = append(set.ColumnSchemas, &pb.ColumnSchema{
+		Name:         "str",
+		TypeName:     "text",
+		IsNullable:   true,
+		IsPrimarykey: false,
+	})
+	set.ColumnSchemas = append(set.ColumnSchemas, &pb.ColumnSchema{
+		Name:         "num",
+		TypeName:     "int64",
+		IsNullable:   true,
+		IsPrimarykey: false,
+	})
+	metaCache.Set("testkey", set, cache.DefaultExpiration)
 }

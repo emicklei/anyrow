@@ -7,27 +7,7 @@ import (
 
 	"github.com/emicklei/anyrow/pb"
 	pgx "github.com/jackc/pgx/v5"
-	"github.com/patrickmn/go-cache"
 )
-
-func TestMain(m *testing.M) {
-	set := new(pb.RowSet)
-	set.TableName = "test"
-	set.ColumnSchemas = append(set.ColumnSchemas, &pb.ColumnSchema{
-		Name:         "str",
-		TypeName:     "text",
-		IsNullable:   true,
-		IsPrimarykey: false,
-	})
-	set.ColumnSchemas = append(set.ColumnSchemas, &pb.ColumnSchema{
-		Name:         "num",
-		TypeName:     "int64",
-		IsNullable:   true,
-		IsPrimarykey: false,
-	})
-	metaCache.Set("testkey", set, cache.DefaultExpiration)
-	m.Run()
-}
 
 func TestFilterObjects(t *testing.T) {
 	ctx := context.Background()
