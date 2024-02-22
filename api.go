@@ -3,7 +3,6 @@ package anyrow
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/emicklei/anyrow/pb"
 	pgx "github.com/jackc/pgx/v5"
@@ -144,10 +143,6 @@ func (pkv PrimaryKeysAndValues) parameterValues() (list []any) {
 type PrimaryKeyAndValue struct {
 	Column string
 	Value  any
-}
-
-func (pkv PrimaryKeyAndValue) String() string {
-	return fmt.Sprintf("%s=%v", pkv.Column, pkv.Value)
 }
 
 // NewPrimaryKeyAndValue creates a parameter object.

@@ -85,7 +85,7 @@ func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, filter f
 				collector.storeBool(i, each.(bool))
 			case [16]uint8:
 				// handle as pgtype.UUID
-				collector.storeString(i, UUIDToString(each.([16]uint8)))
+				collector.storeString(i, _UUIDToString(each.([16]uint8)))
 			case pgtype.Numeric:
 				// large numbers need to be quoted
 				data, _ := json.Marshal(each.(pgtype.Numeric))
@@ -99,7 +99,7 @@ func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, filter f
 	return nil
 }
 
-// UUIDToString returns format xxxx-yyyy-zzzz-rrrr-tttt
-func UUIDToString(src [16]uint8) string {
+// _UUIDToString returns format xxxx-yyyy-zzzz-rrrr-tttt
+func _UUIDToString(src [16]uint8) string {
 	return fmt.Sprintf("%x-%x-%x-%x-%x", src[0:4], src[4:6], src[6:8], src[8:10], src[10:16])
 }

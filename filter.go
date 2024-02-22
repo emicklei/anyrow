@@ -23,7 +23,7 @@ func (f fetchFilter) whereOn(b *strings.Builder) {
 	}
 	// or multiple keys with one value or more values
 	if len(f.pkv.pairs) > 1 {
-		// chain of ORs:  (p1=v1 and p2=v2)
+		// chain of ANDs:  (p1=v1 and p2=v2)
 		b.WriteRune('(')
 		p := 1
 		for i, each := range f.pkv.pairs {
