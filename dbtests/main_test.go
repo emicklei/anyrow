@@ -13,7 +13,8 @@ import (
 var testConnect *pgx.Conn
 
 func TestMain(m *testing.M) {
-	connectionString := os.Getenv("PGTALK_CONN") // "postgres://postgres:pgtalk@localhost:7432/postgres"
+	os.Setenv("ANYROW_CONN", "postgres://postgres:anyrowdb@localhost:7432/postgres")
+	connectionString := os.Getenv("ANYROW_CONN")
 	if len(connectionString) == 0 {
 		println("no database env set")
 		os.Exit(m.Run())
@@ -47,19 +48,19 @@ func ensureTables(conn *pgx.Conn) error {
 	drop table IF EXISTS fieldbags;
 	create table fieldbags (
 		id uuid,
-		tDate date,
-		tTimestamp timestamp without time zone,
-		TJSONB jsonb,
-		TJSON json,
-		tText text,
+		tdate date,
+		ttimestamp timestamp without time zone,
+		tjsonb jsonb,
+		tjson json,
+		ttext text,
 		tNumeric numeric,
-		tDecimal decimal,
-		tDoublePrecision double precision,
-		tFloat float,
-		tInteger integer,
-		tSmallint smallint,
-		tBigint bigint,
-		tBoolean boolean
+		tdecimal decimal,
+		tdoubleprecision double precision,
+		tfloat float,
+		tinteger integer,
+		tsmallint smallint,
+		tbigint bigint,
+		tboolean boolean
 	);`)
 	if err != nil {
 		tx.Rollback(ctx)

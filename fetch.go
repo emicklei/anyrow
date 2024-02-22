@@ -62,17 +62,23 @@ func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, filter f
 			case int64:
 				collector.storeInt64(i, each.(int64))
 			case float64:
-				// TODO why 64->32 ???
 				f := each.(float64)
-				// check for integer like
 				tn := metaSet.ColumnSchemas[i].TypeName
+				if tn == "double precision" {
+					if f > math.MaxFloat32 {
+						collector.storeString(i, fmt.Sprintf("%f", f))
+					} else {
+						collector.storeFloat32(i, float32(f))
+					}
+					break
+				}
+				// check for integer like
 				if strings.Contains("integer bigint smallint", tn) {
 					fint, _ := math.Modf(f)
 					collector.storeInt64(i, int64(fint))
-				} else {
-					// is a float like
-					collector.storeFloat32(i, float32(f))
+					break
 				}
+				collector.storeFloat32(i, float32(f))
 			case map[string]any, []any:
 				collector.storeDefault(i, each)
 			case bool:
