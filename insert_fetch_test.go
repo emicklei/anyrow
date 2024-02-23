@@ -33,7 +33,7 @@ func TestInsertThenFetch(t *testing.T) {
 	tx.Commit(ctx)
 
 	pkvs := NewPrimaryKeyAndValues("id", id)
-	rows, err := FetchObjects(ctx, testConnect, "cache", "fieldbags", pkvs)
+	rows, err := FetchRecords(ctx, testConnect, "cache", "fieldbags", pkvs)
 	check(t, err)
 	t.Log(rows)
 	t.Log(rows[0]["id"])

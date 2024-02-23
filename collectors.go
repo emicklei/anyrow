@@ -16,8 +16,8 @@ type valueCollector interface {
 }
 
 type objectCollector struct {
-	list   []Object
-	object Object
+	list   []Record
+	object Record
 	set    *pb.RowSet
 }
 

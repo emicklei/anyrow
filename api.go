@@ -15,11 +15,11 @@ func FilterLimit(limit int) filterOption {
 	}
 }
 
-// Object represents a Table row as a Map.
-type Object map[string]any
+// Record represents a Table row as a Map.
+type Record map[string]any
 
-// FilterObjects queries a table using a WHERE clause. Unless option is given, the limit is 1000.
-func FilterObjects(ctx context.Context, conn Querier, metadataCacheKey, tableName string, where string, options ...filterOption) ([]Object, error) {
+// FilterRecords queries a table using a WHERE clause. Unless option is given, the limit is 1000.
+func FilterRecords(ctx context.Context, conn Querier, metadataCacheKey, tableName string, where string, options ...filterOption) ([]Record, error) {
 	set, ok := metaCache.Get(metadataCacheKey)
 	if !ok {
 		mset, err := getMetadata(ctx, conn, tableName)
@@ -64,8 +64,8 @@ func FetchColumns(ctx context.Context, conn Querier, tableName string) ([]*pb.Co
 	return set.ColumnSchemas, nil
 }
 
-// FetchObjects returns a list of Objects (generic maps) for the given list primary key values.
-func FetchObjects(ctx context.Context, conn Querier, metadataCacheKey, tableName string, pkv PrimaryKeysAndValues) ([]Object, error) {
+// FetchRecords returns a list of Objects (generic maps) for the given list primary key values.
+func FetchRecords(ctx context.Context, conn Querier, metadataCacheKey, tableName string, pkv PrimaryKeysAndValues) ([]Record, error) {
 	set, ok := metaCache.Get(metadataCacheKey)
 	if !ok {
 		mset, err := getMetadata(ctx, conn, tableName)
@@ -111,7 +111,8 @@ func FetchRowSet(ctx context.Context, conn Querier, metadataCacheKey, tableName 
 	return collector.set, err
 }
 
-// Querier is the method used for a connection.
+// Querier is the interface that is used from a database connection.
+// Known implementations are *pgx.Conn and *pgx.Tx and *pgxpool.Conn.
 type Querier interface {
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
 }

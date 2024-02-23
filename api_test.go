@@ -12,7 +12,7 @@ import (
 func TestFilterObjects(t *testing.T) {
 	ctx := context.Background()
 	conn := new(mockQuerier)
-	list, err := FilterObjects(ctx, conn, "testkey", "test", "id = 1")
+	list, err := FilterRecords(ctx, conn, "testkey", "test", "id = 1")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -27,7 +27,7 @@ func TestFilterObjects(t *testing.T) {
 func TestFilterObjectsEmptyWhere(t *testing.T) {
 	ctx := context.Background()
 	conn := new(mockQuerier)
-	list, err := FilterObjects(ctx, conn, "testkey", "test", "")
+	list, err := FilterRecords(ctx, conn, "testkey", "test", "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -42,7 +42,7 @@ func TestFilterObjectsEmptyWhere(t *testing.T) {
 func TestFilterObjectsLimit(t *testing.T) {
 	ctx := context.Background()
 	conn := new(mockQuerier)
-	_, err := FilterObjects(ctx, conn, "testkey", "test", "", FilterLimit(3))
+	_, err := FilterRecords(ctx, conn, "testkey", "test", "", FilterLimit(3))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func TestFetchObjects(t *testing.T) {
 	ctx := context.Background()
 	conn := new(mockQuerier)
 	pkv := NewPrimaryKeyAndValues("id", "1", "2")
-	list, err := FetchObjects(ctx, conn, "testkey", "test", pkv)
+	list, err := FetchRecords(ctx, conn, "testkey", "test", pkv)
 	if err != nil {
 		t.Fatal(err)
 	}
