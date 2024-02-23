@@ -24,7 +24,7 @@ func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, filter f
 		if i > 0 {
 			qb.WriteRune(',')
 		}
-		fmt.Fprint(qb, each.Name)
+		fmt.Fprintf(qb, "%q", each.Name)
 	}
 	qb.WriteString(" FROM ")
 	qb.WriteString(metaSet.TableName)
