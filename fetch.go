@@ -61,6 +61,8 @@ func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, filter f
 				collector.storeString(i, each.(string))
 			case int64:
 				collector.storeInt64(i, each.(int64))
+			case int32:
+				collector.storeInt64(i, int64(each.(int32)))
 			case float64:
 				f := each.(float64)
 				tn := metaSet.ColumnSchemas[i].TypeName
