@@ -26,6 +26,7 @@ func getMetadata(ctx context.Context, conn Querier, tableName string) (*pb.RowSe
 		schema = tableName[:strings.Index(tableName, ".")]
 		tableName = tableName[strings.Index(tableName, ".")+1:]
 	}
+	qualifiedTableName := fmt.Sprintf("%s.%s", schema, tableName)
 	query := `
 SELECT column_name, data_type, is_nullable,
 	EXISTS (
@@ -39,9 +40,9 @@ SELECT column_name, data_type, is_nullable,
 FROM information_schema.columns isc
 WHERE table_name = $2 AND table_schema = $3;
 `
-	rows, err := conn.Query(ctx, query, tableName, tableName, schema)
+	rows, err := conn.Query(ctx, query, qualifiedTableName, tableName, schema)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("getMetadata failed: %w, table:%s, schema:%s", err, tableName, schema)
 	}
 	defer rows.Close()
 
@@ -57,9 +58,8 @@ WHERE table_name = $2 AND table_schema = $3;
 				fmt.Println(pgErr.Message) // => syntax error at end of input
 				fmt.Println(pgErr.Code)    // => 42601
 			}
-			return nil, err
+			return nil, fmt.Errorf("getMetadata.scan failed: %w, table:%s, schema:%s", err, tableName, schema)
 		}
-		//fmt.Println(columnName, dataType, isNullable, isPrimary)
 		set.ColumnSchemas = append(set.ColumnSchemas, &pb.ColumnSchema{
 			Name:         columnName,
 			TypeName:     dataType,

@@ -27,6 +27,8 @@ func fetchValues(ctx context.Context, conn Querier, metaSet *pb.RowSet, filter f
 		fmt.Fprintf(qb, "%q", each.Name)
 	}
 	qb.WriteString(" FROM ")
+	qb.WriteString(metaSet.SchemaName)
+	qb.WriteRune('.')
 	qb.WriteString(metaSet.TableName)
 	qb.WriteString(" WHERE ")
 	filter.whereOn(qb)
