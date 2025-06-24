@@ -73,6 +73,7 @@ func ensureTables(conn *pgx.Conn) error {
 
 func setupTestKey() {
 	set := new(pb.RowSet)
+	set.SchemaName = "public"
 	set.TableName = "test"
 	set.ColumnSchemas = append(set.ColumnSchemas, &pb.ColumnSchema{
 		Name:         "str",
